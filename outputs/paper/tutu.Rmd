@@ -1,6 +1,6 @@
 ---
-title: "STA304A3"
-author: "vincent"
+title: "STA304A3^[Code and data are available at https://github.com/YN7666/sta-304-a3]"
+author: "Zelong Yu, Yiyi Ren, Zihan Jin"
 date: "03/20/2022"
 output: 
   pdf_document:
