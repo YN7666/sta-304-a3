@@ -1,0 +1,322 @@
+---
+title: "STA304A3"
+author: "vincent"
+date: "02/22/2022"
+output: 
+  pdf_document:
+    fig_caption: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(kableExtra)
+library(car)
+library(patchwork)
+library(gcookbook)           
+gss <- read_csv("gss.csv")
+```
+
+
+```{r,echo=FALSE,error=FALSE,warning=FALSE}
+ ggplot(gss, aes(x= feelings_life)) +
+  geom_bar(fill="#19b3a2") +
+  theme_classic() +
+  labs(y= "number of response", title="Fig.1 different feelings_life group")
+feel <- gss %>% select(feelings_life)%>% filter(!is.na(feelings_life))
+table1 <- feel %>% summarise(min = min(feelings_life),
+                             `1st Qu.` = quantile(feelings_life, 0.25),
+                             median = median(feelings_life),
+                             `3st Qu.` = quantile(feelings_life, 0.75),
+                             max = max(feelings_life),
+                             IQR = `3st Qu.` -`1st Qu.`,
+                             sd = sd(feelings_life),
+                             small_outliers = sum(feelings_life< `1st Qu.` -1.5*IQR),
+                             large_outliers = sum(feelings_life> `3st Qu.` +1.5*IQR)) %>% 
+  kable(caption = "general interested relevant groups") %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  kable_styling(latex_options = "HOLD_position")
+table1
+```
+```{r,echo=FALSE, warning=FALSE, fig.height = 12, fig.width = 12}
+gss_data <- gss %>% filter(!is.na(income_respondent)&!is.na(education)&!is.na(self_rated_health)&!is.na(self_rated_mental_health)&!is.na(average_hours_worked)&!is.na(average_hours_worked)&!is.na(marital_status)& self_rated_health != "Don't know"& self_rated_mental_health != "Don't know"&average_hours_worked != "Don't know"& marital_status != "Don't know")
+g1<-ggplot(gss_data, aes(y= income_respondent)) +
+  geom_bar(fill="#69b3a2") +
+  theme_classic() +
+  labs(x= "number of response", title="different income_respondent group")
+g2<-ggplot(gss_data, aes(y= education)) +
+  geom_bar(fill="#69b3a2") +
+  theme_classic() +
+  labs(x= "number of response", title="different education group")
+g3 <-ggplot(gss_data, aes(y= self_rated_health)) +
+  geom_bar(fill="#69b3a2") +
+  theme_classic() +
+  labs(x= "number of response", title="different self_rated_health group")
+g4 <-ggplot(gss_data, aes(y= self_rated_mental_health)) +
+  geom_bar(fill="#69b3a2") +
+  theme_classic() +
+  labs(x= "number of response", title="different self_rated_mental_health group")
+g5 <-ggplot(gss_data, aes(y= average_hours_worked)) +
+  geom_bar(fill="#69b3a2") +
+  theme_classic() +
+  labs(x= "number of response", title="different average_hours_worked group")
+g6 <-ggplot(gss_data, aes(y= marital_status)) +
+  geom_bar(fill="#69b3a2") +
+  theme_classic() +
+  labs(x= "number of response", title="different marital_status group")
+g_all <- (g1 + g2) /
+(g3 + g4) /
+(g5 + g6)  +    # Create grid of plots with title
+  plot_annotation(title = "fig.2 six interested relevent groups") & 
+  theme(plot.title = element_text(hjust = 0.5))
+g_all    
+```
+\newpage
+```{r,echo=FALSE, warning=FALSE}
+table <-gss %>% filter(!is.na(income_respondent)&!is.na(education)&!is.na(self_rated_health)&!is.na(self_rated_mental_health)&!is.na(average_hours_worked)&!is.na(average_hours_worked)&!is.na(marital_status)& self_rated_health != "Don't know"& self_rated_mental_health != "Don't know"&average_hours_worked != "Don't know"& marital_status != "Don't know")
+table1 <- table %>% count(income_respondent, sort = TRUE)
+table2 <- table %>% count(education, sort = TRUE) 
+table3 <- table %>% count(self_rated_health, sort = TRUE) 
+table4 <-table %>% count(self_rated_mental_health, sort = TRUE) 
+table5 <-table %>% count(average_hours_worked, sort = TRUE) 
+table6 <-table %>% count(marital_status, sort = TRUE) 
+list(table1,table6)%>% 
+  kable(caption = "general interested relevant groups")%>%
+  kable_classic(full_width = F) %>%
+  kable_styling(latex_options = "HOLD_position") 
+list(table3,table4,table5)%>% 
+  kable() %>%
+  kable_classic(full_width = F)%>%
+  kable_styling(latex_options = "HOLD_position") 
+table2%>% 
+  kable() %>%
+  kable_classic(full_width = F)%>%
+  kable_styling(latex_options = "HOLD_position") 
+```
+
+```{r,echo=FALSE,error=FALSE,warning=FALSE}
+feeling_data <- gss %>% select(feelings_life, age) %>% filter(!is.na(feelings_life))
+feeling_data$age <- round(feeling_data$age) 
+feelingdata <- feeling_data %>% group_by(age) %>% summarise(mean_feelings_life = mean(feelings_life))
+ggplot(feelingdata, aes(x=age, y = mean_feelings_life)) +
+geom_line()+ 
+  theme(panel.grid = element_line(color = "#8ccde3",
+                                  size = 0.75,
+                                  linetype = 2))+
+  labs(x = "age", y = "average feelings of life from 0 to 10", title = "relationship between age and feelings_life") 
+```
+
+```{r,echo=FALSE,error=FALSE,warning=FALSE}
+a=c(1,2,3,4,5,6,7,8,9,10)
+income_data <- gss %>% select(income_respondent, feelings_life) %>% filter(!is.na(feelings_life) & !is.na(income_respondent))
+incomedata <- income_data %>%group_by(feelings_life) %>% summarise("<$25,000" = sum(income_respondent == "Less than $25,000"),"$25,000 to $49,999" = sum(income_respondent == "$25,000 to $49,999"), "$50,000 to $74,999" = sum(income_respondent == "$50,000 to $74,999"),"$75,000 to $99,999" = sum(income_respondent == "$75,000 to $99,999"), "$100,000 to $124,999" = sum(income_respondent == "$100,000 to $ 124,999"),"$125,000 and more" = sum(income_respondent == "$125,000 and more"))
+incomedata$`<$25,000` = incomedata$`<$25,000`/sum(incomedata$`<$25,000`)
+incomedata$`$25,000 to $49,999` = incomedata$`$25,000 to $49,999`/sum(incomedata$`$25,000 to $49,999`)
+incomedata$`$50,000 to $74,999` = incomedata$`$50,000 to $74,999`/sum(incomedata$`$50,000 to $74,999`)
+incomedata$`$75,000 to $99,999` = incomedata$`$75,000 to $99,999`/sum(incomedata$`$75,000 to $99,999`)
+incomedata$`$100,000 to $124,999` = incomedata$`$100,000 to $124,999`/sum(incomedata$`$100,000 to $124,999`)
+incomedata$`$125,000 and more` = incomedata$`$125,000 and more`/sum(incomedata$`$125,000 and more`)
+dfb<-gather(incomedata,key=income_group,value=percent_of_Respondent,c("<$25,000","$25,000 to $49,999","$50,000 to $74,999","$75,000 to $99,999","$100,000 to $124,999","$125,000 and more"))
+gfa<- ggplot(dfb, aes(x=feelings_life, y = percent_of_Respondent, group = income_group, colour = income_group)) +
+  geom_line() +
+  theme_classic() + scale_x_continuous(breaks = a)+
+  labs( title="different income group relevant to feelings_life in percent")
+```
+
+```{r,echo=FALSE,error=FALSE,warning=FALSE}
+edu_data <- gss %>% select(education, feelings_life) %>% filter(!is.na(feelings_life) & !is.na(education))
+group <- edu_data %>%group_by(education) %>% summarise(n=n())
+edudata <- edu_data %>%group_by(feelings_life) %>% summarise("high school" = sum(education == "High school diploma or a high school equivalency certificate"),"below high school" = sum(education == "Less than high school diploma or its equivalent"), "college" = sum(education == "College, CEGEP or other non-university certificate or di..."),"Bachelor" = sum(education == "Bachelor's degree (e.g. B.A., B.Sc., LL.B.)"), "trade certificate" = sum(education == "Trade certificate or diploma"),"under Bachelor" = sum(education == "University certificate or diploma below the bachelor's level"), "above Bachelor" = sum(education == "University certificate, diploma or degree above the bach...")) 
+edudata$`high school` = edudata$`high school`/sum(edudata$`high school`)
+edudata$`below high school` = edudata$`below high school`/sum(edudata$`below high school`)
+edudata$college = edudata$college /sum(edudata$college)
+edudata$Bachelor =edudata$Bachelor /sum(edudata$Bachelor)
+edudata$`trade certificate` = edudata$`trade certificate`/ sum(edudata$`trade certificate`)
+edudata$`under Bachelor` = edudata$`under Bachelor` /sum(edudata$`under Bachelor`)
+edudata$`above Bachelor` =edudata$`above Bachelor` /sum(edudata$`above Bachelor`)
+dfc <- gather(edudata, key = edu_group, value = percent_of_Respondent, c("below high school", "high school","trade certificate","college", "under Bachelor", "Bachelor","above Bachelor"))
+gfb <- ggplot(dfc, aes(x=feelings_life, y = percent_of_Respondent, group = edu_group, colour = edu_group)) +
+  geom_line() +
+  theme_classic() + scale_x_continuous(breaks = a)+
+  labs( title="different education group relevant to feelings_life")
+```
+
+```{r,echo=FALSE,error=FALSE,warning=FALSE}
+health_data <- gss %>% select(self_rated_health, feelings_life) %>% filter(!is.na(feelings_life) & !is.na(self_rated_health)& self_rated_health != "Don't know")
+group <- health_data %>%group_by(self_rated_health) %>% summarise(n=n())
+healthdata <- health_data %>%group_by(feelings_life) %>% summarise("Excellent" = (sum(self_rated_health == "Excellent")),"Fair" = (sum(self_rated_health == "Fair")),"Good" = (sum(self_rated_health == "Good")),"Poor" = (sum(self_rated_health == "Poor")),"Very good" = (sum(self_rated_health == "Very good")))
+healthdata$Excellent = healthdata$Excellent /sum(healthdata$Excellent)
+healthdata$Fair = healthdata$Fair/sum(healthdata$Fair)
+healthdata$Good = healthdata$Good/sum(healthdata$Good)
+healthdata$Poor = healthdata$Poor/sum(healthdata$Poor)
+healthdata$`Very good` = healthdata$`Very good`/ sum(healthdata$`Very good`)
+dff <- gather(healthdata, key = health_group, value = percent_of_Respondent, c("Excellent", "Fair","Good", "Poor", "Very good"))
+ gfc <- ggplot(dff, aes(x=feelings_life, y = percent_of_Respondent, group = health_group, colour = health_group)) +
+  geom_line() +
+  theme_classic() + scale_x_continuous(breaks = a)+
+  labs( title="different health rated group relevant to feelings_life")
+```
+
+```{r,echo=FALSE,error=FALSE,warning=FALSE}
+mental_health_data <- gss %>% select(self_rated_mental_health, feelings_life) %>% filter(!is.na(feelings_life) & !is.na(self_rated_mental_health)& self_rated_mental_health != "Don't know")
+group <- mental_health_data %>%group_by(self_rated_mental_health) %>% summarise(n=n())
+mentalhealth_data <- mental_health_data %>%group_by(feelings_life) %>% summarise("Excellent" = (sum(self_rated_mental_health == "Excellent")),"Fair" = (sum(self_rated_mental_health == "Fair")),"Good" = (sum(self_rated_mental_health == "Good")),"Poor" = (sum(self_rated_mental_health == "Poor")), "Very good"= (sum(self_rated_mental_health == "Very good")))
+mentalhealth_data$Excellent = mentalhealth_data$Excellent/sum(mentalhealth_data$Excellent)
+mentalhealth_data$Fair = mentalhealth_data$Fair /sum(mentalhealth_data$Fair)
+mentalhealth_data$Good = mentalhealth_data$Good /sum(mentalhealth_data$Good)
+mentalhealth_data$Poor = mentalhealth_data$Poor/sum(mentalhealth_data$Poor)
+mentalhealth_data$`Very good` =mentalhealth_data$`Very good`/sum(mentalhealth_data$`Very good`)
+dfh <- gather(mentalhealth_data, key = metal_group, value = percent_of_Respondent, c("Excellent", "Fair","Good", "Poor", "Very good"))
+gfd <- ggplot(dfh, aes(x=feelings_life, y = percent_of_Respondent, group = metal_group, colour = metal_group)) +
+  geom_line() +
+  theme_classic() + scale_x_continuous(breaks = a)+
+  labs( title="different mental_health group relevant to feelings_life")
+```
+
+```{r,echo=FALSE,error=FALSE,warning=FALSE}
+work_data <- gss %>% select(average_hours_worked, feelings_life) %>% filter(!is.na(feelings_life) & !is.na(average_hours_worked)& average_hours_worked != "Don't know")
+group <- work_data %>%group_by(average_hours_worked) %>% summarise(n=n())
+workdata <- work_data %>%group_by(feelings_life) %>% summarise("0 hour" = (sum(average_hours_worked == "0 hour")),"0.1 to 29.9 hours" = (sum(average_hours_worked == "0.1 to 29.9 hours")),"30.0 to 40.0 hours" = (sum(average_hours_worked == "30.0 to 40.0 hours")),"40.1 to 50.0 hours" = (sum(average_hours_worked == "40.1 to 50.0 hours")),"50.1 hours and more" = (sum(average_hours_worked == "50.1 hours and more")))
+workdata$`0 hour` = workdata$`0 hour`/sum(workdata$`0 hour`)
+workdata$`0.1 to 29.9 hours` = workdata$`0.1 to 29.9 hours`/sum(workdata$`0.1 to 29.9 hours`)
+workdata$`30.0 to 40.0 hours` = workdata$`30.0 to 40.0 hours`/ sum(workdata$`30.0 to 40.0 hours`)
+workdata$`40.1 to 50.0 hours` = workdata$`40.1 to 50.0 hours`/sum(workdata$`40.1 to 50.0 hours`)
+workdata$`50.1 hours and more` = workdata$`50.1 hours and more`/sum(workdata$`50.1 hours and more`)
+ dff <- gather(workdata, key = work_group, value = percent_of_Respondent, c("0 hour", "0.1 to 29.9 hours","30.0 to 40.0 hours", "40.1 to 50.0 hours", "50.1 hours and more"))
+gfe <- ggplot(dff, aes(x=feelings_life, y = percent_of_Respondent, group = work_group, colour = work_group)) +
+  geom_line() +
+  theme_classic() + scale_x_continuous(breaks = a)+
+  labs( title="different number of hours worked per week group relevant to feelings_life")
+```
+
+```{r,echo=FALSE,error=FALSE,warning=FALSE}
+marital_data <- gss %>% select(marital_status, feelings_life) %>% filter(!is.na(feelings_life) & !is.na(marital_status)& marital_status != "Don't know")
+group <- marital_data %>%group_by(marital_status) %>% summarise(n=n())
+maritaldata <- marital_data %>%group_by(feelings_life) %>% summarise("Divorced" = (sum(marital_status == "Divorced")),"Living common-law" = (sum(marital_status == "Living common-law")),"Married" = (sum(marital_status == "Married")),"Separated" = (sum(marital_status == "Separated")),"Single, never married" = (sum(marital_status == "Single, never married")), "Widowed" = (sum(marital_status == "Widowed")))
+maritaldata$Divorced = maritaldata$Divorced/ sum(maritaldata$Divorced)
+maritaldata$`Living common-law` = maritaldata$`Living common-law`/ sum(maritaldata$`Living common-law`)
+maritaldata$Married = maritaldata$Married/ sum(maritaldata$Married)
+maritaldata$Separated =maritaldata$Separated/sum(maritaldata$Separated)
+maritaldata$`Single, never married` = maritaldata$`Single, never married` /sum(maritaldata$`Single, never married`)
+maritaldata$Widowed = maritaldata$Widowed /sum(maritaldata$Widowed)
+dfg <- gather(maritaldata, key = marital_group, value = percent_of_Respondent, c("Divorced", "Living common-law","Married", "Separated","Single, never married","Widowed"))
+gff <- ggplot(dfg, aes(x=feelings_life, y = percent_of_Respondent, group = marital_group, colour = marital_group)) +
+  geom_line() +
+  theme_classic() + scale_x_continuous(breaks = a)+
+  labs( title="different types marital status per week group relevant to feelings_life")
+```
+```{r,echo=FALSE, warning=FALSE, fig.height = 12, fig.width = 12}
+gg_all <- (gfa + gfb) /
+(gfc + gfd) /
+(gfe + gff)  +    # Create grid of plots with title
+  plot_annotation(title = "fig.2 six interested relevent groups") & 
+  theme(plot.title = element_text(hjust = 0.5))
+gg_all 
+```
+
+```{r,echo=FALSE,error=FALSE,warning=FALSE}
+tmp2 <- gss %>% select(average_hours_worked, feelings_life, sex) %>% filter(!is.na(feelings_life) & !is.na(average_hours_worked) &!is.na(sex) & average_hours_worked != "Don't know")
+tmp21<- tmp2 %>%filter(sex =="Male")
+tmp22<- tmp2 %>%filter(sex =="Female")
+tmp211 <- tmp21 %>%group_by(average_hours_worked) %>% summarise(feelings_life_male = mean(feelings_life))
+tmp212 <-tmp211 %>% mutate(average_hour = case_when(average_hours_worked == "0 hour" ~ 0,
+                                                    average_hours_worked == "0.1 to 29.9 hours" ~ 30,
+                                                    average_hours_worked == "30.0 to 40.0 hours" ~ 40,
+                                                    average_hours_worked == "40.1 to 50.0 hours" ~ 50,
+                                                    average_hours_worked == "50.1 hours and more" ~ 60))
+tmp221 <- tmp22 %>%group_by(average_hours_worked) %>% summarise(feelings_life_female = mean(feelings_life))
+tmp222 <-tmp221 %>% mutate(average_hour = case_when(average_hours_worked == "0 hour" ~ 0,
+                                                    average_hours_worked == "0.1 to 29.9 hours" ~ 30,
+                                                    average_hours_worked == "30.0 to 40.0 hours" ~ 40,
+                                                    average_hours_worked == "40.1 to 50.0 hours" ~ 50,
+                                                    average_hours_worked == "50.1 hours and more" ~ 60))
+tmp3 <- merge(tmp212,tmp222,by=c("average_hour"))
+tmp4 <- gather(tmp3, key = feeling_of_different_sex, value = feeling_of_life, c("feelings_life_male","feelings_life_female"))
+ggplot(tmp4, aes(x=average_hour, y = feeling_of_life, group = feeling_of_different_sex, colour = feeling_of_different_sex)) +
+  geom_line() +
+  theme_classic()+
+  labs(x = "average_hour of work per week" ,title="different groups of working hours relevant to feelings_life")
+```
+
+```{r,echo=FALSE,error=FALSE,warning=FALSE}
+t_mp2 <- gss %>% select(total_children, feelings_life, sex) %>% filter(!is.na(feelings_life) & !is.na(total_children) &!is.na(sex))
+t_mp21<- t_mp2 %>%filter(sex =="Male")
+t_mp22<- t_mp2 %>%filter(sex =="Female")
+t_mp211 <- t_mp21 %>%group_by(total_children) %>% summarise(feelings_life_male = mean(feelings_life))
+
+t_mp221 <- t_mp22 %>%group_by(total_children) %>% summarise(feelings_life_female = mean(feelings_life))
+t_mp3 <- merge(t_mp211,t_mp221,by=c("total_children"))
+t_mp4 <- gather(t_mp3, key = feeling_of_different_sex, value = feeling_of_life, c("feelings_life_male","feelings_life_female"))
+ggplot(t_mp4, aes(x=total_children, y = feeling_of_life, group = feeling_of_different_sex, colour = feeling_of_different_sex)) +
+  geom_line() +
+  theme_classic() + scale_x_continuous(breaks = a)+ 
+  labs( title="different education group relevant to feelings_life")
+```
+
+```{r,echo=FALSE,error=FALSE,warning=FALSE}
+age_diff_data <- gss %>% select(age_diff, feelings_life,sex) %>% filter(!is.na(feelings_life) & !is.na(age_diff)& age_diff != "Don't know" & sex == "Male")
+tmp1 <- age_diff_data %>%group_by(age_diff) %>% summarise(feelings_life = mean(feelings_life))
+tmp11 <-tmp1 %>% mutate(agediff = case_when(age_diff == "Respondent and spouse/partner are same age" ~ 0,
+                                                    age_diff == "Respondent is 1 year older" ~ 1,
+                                                    age_diff == "Respondent is 2 years older" ~ 2,
+                                                    age_diff == "Respondent is 3 years older" ~ 3,
+                                                    age_diff == "Respondent is 4 years older" ~ 4,
+                                                    age_diff == "Respondent is 5 years older"~ 5,
+                                                    age_diff == "Respondent is 6 to 10 years older" ~ 6,
+                                                    age_diff == "Respondent is 11+ years older" ~ 7)) %>% select(agediff,feelings_life)%>% filter(!is.na(agediff))
+tmp12 <-tmp1 %>% mutate(agediff = case_when(age_diff == "Respondent and spouse/partner are same age" ~ 0,
+                                                    age_diff == "Respondent is 1 year younger" ~ 1,
+                                                    age_diff == "Respondent is 2 years younger"~ 2,
+                                                    age_diff == "Respondent is 3 years younger"~ 3,
+                                                    age_diff == "Respondent is 4 years younger"~ 4,
+                                                    age_diff == "Respondent is 5 years younger"~ 5,
+                                                     age_diff == "Respondent is 6 to 10 years younger"~ 6,
+                                                    age_diff == "Respondent is 11 + years younger"~ 7)) %>% select(agediff,feelings_life)%>% filter(!is.na(agediff))
+tmp3 <- merge(tmp11,tmp12,by=c("agediff"))
+colnames(tmp3)<- c("agediff","feelings_life older", "feelings_life younger")
+tmp4 <- gather(tmp3, key = feeling_of_agediff, value = feeling_of_life, c("feelings_life older", "feelings_life younger"))
+gfg <- ggplot(tmp4, aes(x=agediff, y = feeling_of_life, group = feeling_of_agediff, colour = feeling_of_agediff)) +
+  geom_line() +
+  theme_classic()+
+  labs(x = "difference of age for male", title="different groups of working hours relevant to feelings_life")
+```
+
+```{r,echo=FALSE,error=FALSE,warning=FALSE,fig.height=6 , fig.width = 12}
+age_diff_data <- gss %>% select(age_diff, feelings_life,sex) %>% filter(!is.na(feelings_life) & !is.na(age_diff)& age_diff != "Don't know" & sex == "Female")
+tmp1 <- age_diff_data %>%group_by(age_diff) %>% summarise(feelings_life = mean(feelings_life))
+tmp11 <-tmp1 %>% mutate(agediff = case_when(age_diff == "Respondent and spouse/partner are same age" ~ 0,
+                                                    age_diff == "Respondent is 1 year older" ~ 1,
+                                                    age_diff == "Respondent is 2 years older" ~ 2,
+                                                    age_diff == "Respondent is 3 years older" ~ 3,
+                                                    age_diff == "Respondent is 4 years older" ~ 4,
+                                                    age_diff == "Respondent is 5 years older"~ 5,
+                                                    age_diff == "Respondent is 6 to 10 years older" ~ 6,
+                                                    age_diff == "Respondent is 11+ years older" ~ 7)) %>% select(agediff,feelings_life)%>% filter(!is.na(agediff))
+tmp12 <-tmp1 %>% mutate(agediff = case_when(age_diff == "Respondent and spouse/partner are same age" ~ 0,
+                                                    age_diff == "Respondent is 1 year younger" ~ 1,
+                                                    age_diff == "Respondent is 2 years younger"~ 2,
+                                                    age_diff == "Respondent is 3 years younger"~ 3,
+                                                    age_diff == "Respondent is 4 years younger"~ 4,
+                                                    age_diff == "Respondent is 5 years younger"~ 5,
+                                                     age_diff == "Respondent is 6 to 10 years younger"~ 6,
+                                                    age_diff == "Respondent is 11 + years younger"~ 7)) %>% select(agediff,feelings_life)%>% filter(!is.na(agediff))
+tmp3 <- merge(tmp11,tmp12,by=c("agediff"))
+colnames(tmp3)<- c("agediff","feelings_life older", "feelings_life younger")
+tmp4 <- gather(tmp3, key = feeling_of_agediff, value = feeling_of_life, c("feelings_life older", "feelings_life younger"))
+gfh <-ggplot(tmp4, aes(x=agediff, y = feeling_of_life, group = feeling_of_agediff, colour = feeling_of_agediff)) +
+  geom_line() +
+  theme_classic()+
+  labs(x = "difference of age for female", title="different groups of working hours relevant to feelings_life")
+(gfg | gfh)
+```
+```{r,echo=FALSE,error=FALSE,warning=FALSE}
+work_last_data <- gss %>% select( worked_last_week, feelings_life) %>% filter(!is.na(feelings_life) & !is.na(worked_last_week)& worked_last_week != "Don't know")
+work_last_data$feelings_life <-round(work_last_data$feelings_life)
+group <- work_last_data %>%group_by(worked_last_week) %>% summarise(n=n())
+ ggplot(work_last_data, aes(x= feelings_life, fill = worked_last_week)) +
+  geom_bar() +
+  labs( title="different feelings_life group")
+```
