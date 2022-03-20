@@ -16,6 +16,8 @@ library(car)
 library(patchwork)
 library(gcookbook)           
 gss <- read_csv("gss.csv")
+#install.packages("qrcode")
+library(qrcode)
 
 ```
 
@@ -112,7 +114,7 @@ geom_line()+
   theme(panel.grid = element_line(color = "#8ccde3",
                                   size = 0.5,
                                   linetype = 2))+
-  labs(x = "age", y = "average feelings of life from 0 to 10", title = "relationship between age and feelings_life") 
+  labs(x = "age", y = "average feelings of life from 0 to 10", title = "fig.3: relationship between age and feelings_life") 
 ```
 
 To gain a further understanding of Canadians' feeling about life, we visualized the average feeling about life in each age (15-80 years old). According to Figure 2, we noticed that in childhood, starting from the age of 15, the score of feelings about life is the highest, reaching an average of 8.7. However, the ratings experience a sharp drop immediately, reaching the lowest point around the age of 22, at about 7.65, about 12 percentage points within 7 years, which may be related to the responsibility and stress brought by the separation from childhood. After that, the happiness of life rebounded, but it fell to a local minimum again around the age of 43, and gradually increased as the middle-aged entered old age. Happiness in the 20s to 50s range can be summed up as a notion of U-shape, which is often cited as evidence of the midlife crisis.
@@ -226,7 +228,7 @@ gff <- ggplot(dfg, aes(x=feelings_life, y = percent_of_Respondent, group = marit
 gg_all <- (gfa + gfb) /
 (gfc + gfd) /
 (gfe + gff)  +    # Create grid of plots with title
-  plot_annotation(title = "fig.2 six interested relevent groups") & 
+  plot_annotation(title = "fig.4 six interested relevent groups") & 
   theme(plot.title = element_text(hjust = 0.5))
 gg_all 
 ```
@@ -274,7 +276,7 @@ tmp4 <- gather(tmp3, key = feeling_of_different_sex, value = feeling_of_life, c(
 ggplot(tmp4, aes(x=average_hour, y = feeling_of_life, group = feeling_of_different_sex, colour = feeling_of_different_sex)) +
   geom_line() +
   theme_classic()+
-  labs(x = "average_hour of work per week" ,title="different groups of working hours relevant to feelings_life")
+  labs(x = "average_hour of work per week" ,title="fig.5: different groups of working hours relevant to feelings_life")
 ```
 
 Based on the figure above, increasing average hours of work per week has a positive influence on the rating score of feelings about life for Canadian people. However, the patterns have a prominent gap between that of males and females.
@@ -297,7 +299,7 @@ t_mp4 <- gather(t_mp3, key = feeling_of_different_sex, value = feeling_of_life, 
 ggplot(t_mp4, aes(x=total_children, y = feeling_of_life, group = feeling_of_different_sex, colour = feeling_of_different_sex)) +
   geom_line() +
   theme_classic() + scale_x_continuous(breaks = a)+ 
-  labs( title="Total children relevant to feelings_life")
+  labs( title="fig.6: Total children relevant to feelings_life")
 ```
 
 Children are undoubtedly an important proposition in married life. With the emancipation of the mind, the reform of the economic environment, the improvement of women's status, and other social factors, topics such as reproductive rights and DINK freedom have been widely discussed. According to the above figure, we can initially see the general attitude of the married population to the number of births, and the pattern difference between the total number of children and its impact on life satisfaction on men and women.
@@ -362,7 +364,7 @@ tmp4 <- gather(tmp3, key = feeling_of_agediff, value = feeling_of_life, c("feeli
 gfh <-ggplot(tmp4, aes(x=agediff, y = feeling_of_life, group = feeling_of_agediff, colour = feeling_of_agediff)) +
   geom_line() +
   theme_classic()+
-  labs(x = "difference of age for female", title="different groups of working hours relevant to feelings_life")
+  labs(x = "difference of age for female", title="fig.7: different groups of working hours relevant to feelings_life")
 (gfg | gfh)
 ```
 
@@ -401,7 +403,7 @@ work_last_data$feelings_life <-round(work_last_data$feelings_life)
 group <- work_last_data %>%group_by(worked_last_week) %>% summarise(n=n())
  ggplot(work_last_data, aes(x= feelings_life, fill = worked_last_week)) +
   geom_bar() +
-  labs( title="different feelings_life group") +
+  labs(title= "fig.8: different feelings_life group") +
    theme_classic()
 ```
 
@@ -416,6 +418,19 @@ However, the influence on feelings about life given by working hours per week ma
 
 
 # Appendix
+## Survey:
+Follow the link to our survey or scan our QR Code to survey: https://forms.gle/zzKgsFYK3qtxeWSB6
+```{r,echo=FALSE,error=FALSE,warning=FALSE}
+qrcode_gen('https://forms.gle/zzKgsFYK3qtxeWSB6')
+```
+
+![](WeChat Screenshot_20220320142307.png){#id .class height=90%}
+fig.9:screenshot of survey introduce
+\newpage
+fig.10:screenshot of survey 1-3 _____________ fig.11:screenshot of survey 4-6\
+![](WeChat Screenshot_20220320142338.png){#id .class width=50% }
+![](WeChat Screenshot_20220320142402.png){#id .class width=50% height=120%}\
+
 
 
 
