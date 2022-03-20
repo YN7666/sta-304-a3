@@ -1,10 +1,8 @@
 ---
-title: "STA304A3"
+title: "STA304A3^[Code and data are available at https://github.com/YN7666/sta-304-a3]"
 author: "vincent"
 date: "02/22/2022"
-output: 
-  pdf_document: 
-    latex_engine: xelatex
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -112,7 +110,7 @@ feelingdata <- feeling_data %>% group_by(age) %>% summarise(mean_feelings_life =
 ggplot(feelingdata, aes(x=age, y = mean_feelings_life)) +
 geom_line()+ 
   theme(panel.grid = element_line(color = "#8ccde3",
-                                  size = 0.75,
+                                  size = 0.5,
                                   linetype = 2))+
   labs(x = "age", y = "average feelings of life from 0 to 10", title = "relationship between age and feelings_life") 
 ```
