@@ -427,10 +427,13 @@ qrcode_gen('https://forms.gle/zzKgsFYK3qtxeWSB6')
 ![](WeChat Screenshot_20220320142307.png){#id .class height=90%}
 fig.9:screenshot of survey introduce
 \newpage
-fig.10:screenshot of survey 1-3 _____________ fig.11:screenshot of survey 4-6\
+fig.10:screenshot of survey 1-4 _____________ fig.11:screenshot of survey 4-7\
 ![](WeChat Screenshot_20220320142338.png){#id .class width=50% }
 ![](WeChat Screenshot_20220320142402.png){#id .class width=50% height=120%}\
-
+\newpage
+fig.12:screenshot of survey 8-10 _____________ fig.13:screenshot of survey 11-13\
+![](WeChat Screenshot_20220320163931.png){#id .class width=50% height=120%}
+![](WeChat Screenshot_20220320163954.png){#id .class width=50% height=120%}\
 
 
 
