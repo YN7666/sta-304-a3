@@ -1,10 +1,10 @@
 ---
-title: "STA304A3^[Code and data are available at https://github.com/YN7666/sta-304-a3]"
-author: "Zelong Yu, Yiyi Ren, Zihan Jin"
-date: "03/20/2022"
+title: "STA304A3"
+author: "vincent"
+date: "02/22/2022"
 output: 
-  pdf_document:
-    fig_caption: yes
+  pdf_document: 
+    latex_engine: xelatex
 ---
 
 ```{r setup, include=FALSE}
@@ -18,14 +18,19 @@ library(car)
 library(patchwork)
 library(gcookbook)           
 gss <- read_csv("gss.csv")
+
 ```
 
+# Data
+
+## EDA
 
 ```{r,echo=FALSE,error=FALSE,warning=FALSE}
+a=c(1,2,3,4,5,6,7,8,9,10)
  ggplot(gss, aes(x= feelings_life)) +
   geom_bar(fill="#19b3a2") +
-  theme_classic() +
-  labs(y= "number of response", title="Fig.1 different feelings_life group")
+  theme_classic() + scale_x_continuous(breaks = a)+
+  labs(y= "number of response", title="Fig.1 distribution of feeling about life")
 feel <- gss %>% select(feelings_life)%>% filter(!is.na(feelings_life))
 table1 <- feel %>% summarise(min = min(feelings_life),
                              `1st Qu.` = quantile(feelings_life, 0.25),
@@ -36,45 +41,49 @@ table1 <- feel %>% summarise(min = min(feelings_life),
                              sd = sd(feelings_life),
                              small_outliers = sum(feelings_life< `1st Qu.` -1.5*IQR),
                              large_outliers = sum(feelings_life> `3st Qu.` +1.5*IQR)) %>% 
-  kable(caption = "general interested relevant groups") %>%
+  kable(caption = "summary statistic of feeling about life") %>%
   kable_classic(full_width = F, html_font = "Cambria") %>%
   kable_styling(latex_options = "HOLD_position")
 table1
 ```
+
+Figure 1 reflects the distribution of feeling about life as a whole among the survey sample, which is 20602 non-institutional respondents from Canada 2017 general social survey. The current feelings about life as a whole are expressed using a scale of 0 to 10, where 0 means "Very dissatisfied" and 10 means "Very satisfied". All respondents are required to answer the question "how do you feel about your life as a whole right now?". Under the assumption that the sample size is fair enough to represent the whole population, all persons 15 years of age and older in Canada in 2017, without selection bias, we can conclude a general situation of Canadian feelings about life.
+
+The distribution of feelings about life is left-skewed and single-peaked, which means most Canadian people have an above-average (>5) feeling about their life and the major responses are concentrated in the score of 8. Moreover, the second and third largest proportion of scores being selected is 10 and 9, the two best scores can be given by the respondents when filling in the survey. One explanation that counterarguments the positive estimation of Canadian life feeling is Canadians may prone to give extreme emotional expression when rating their feeling of life. However, less number of the response of score 0 is given. Therefore, it is rational to say that Canadians report high levels of happiness about life.
+
 ```{r,echo=FALSE, warning=FALSE, fig.height = 12, fig.width = 12}
 gss_data <- gss %>% filter(!is.na(income_respondent)&!is.na(education)&!is.na(self_rated_health)&!is.na(self_rated_mental_health)&!is.na(average_hours_worked)&!is.na(average_hours_worked)&!is.na(marital_status)& self_rated_health != "Don't know"& self_rated_mental_health != "Don't know"&average_hours_worked != "Don't know"& marital_status != "Don't know")
 g1<-ggplot(gss_data, aes(y= income_respondent)) +
   geom_bar(fill="#69b3a2") +
   theme_classic() +
-  labs(x= "number of response", title="different income_respondent group")
+  labs(x= "number of response", title="distribution of income")
 g2<-ggplot(gss_data, aes(y= education)) +
   geom_bar(fill="#69b3a2") +
   theme_classic() +
-  labs(x= "number of response", title="different education group")
+  labs(x= "number of response", title="distribution of education")
 g3 <-ggplot(gss_data, aes(y= self_rated_health)) +
   geom_bar(fill="#69b3a2") +
   theme_classic() +
-  labs(x= "number of response", title="different self_rated_health group")
+  labs(x= "number of response", title="distribution of self rated health")
 g4 <-ggplot(gss_data, aes(y= self_rated_mental_health)) +
   geom_bar(fill="#69b3a2") +
   theme_classic() +
-  labs(x= "number of response", title="different self_rated_mental_health group")
+  labs(x= "number of response", title="distribution of self rated mental health")
 g5 <-ggplot(gss_data, aes(y= average_hours_worked)) +
   geom_bar(fill="#69b3a2") +
   theme_classic() +
-  labs(x= "number of response", title="different average_hours_worked group")
+  labs(x= "number of response", title="distribution of average hours worked per week")
 g6 <-ggplot(gss_data, aes(y= marital_status)) +
   geom_bar(fill="#69b3a2") +
   theme_classic() +
-  labs(x= "number of response", title="different marital_status group")
+  labs(x= "number of response", title="distribution of marital status")
 g_all <- (g1 + g2) /
 (g3 + g4) /
-(g5 + g6)  +    # Create grid of plots with title
-  plot_annotation(title = "fig.2 six interested relevent groups") & 
+(g5 + g6)  +   
+  plot_annotation(title = "fig.2 six interested relevant groups") & 
   theme(plot.title = element_text(hjust = 0.5))
 g_all    
 ```
-\newpage
 ```{r,echo=FALSE, warning=FALSE}
 table <-gss %>% filter(!is.na(income_respondent)&!is.na(education)&!is.na(self_rated_health)&!is.na(self_rated_mental_health)&!is.na(average_hours_worked)&!is.na(average_hours_worked)&!is.na(marital_status)& self_rated_health != "Don't know"& self_rated_mental_health != "Don't know"&average_hours_worked != "Don't know"& marital_status != "Don't know")
 table1 <- table %>% count(income_respondent, sort = TRUE)
@@ -84,18 +93,17 @@ table4 <-table %>% count(self_rated_mental_health, sort = TRUE)
 table5 <-table %>% count(average_hours_worked, sort = TRUE) 
 table6 <-table %>% count(marital_status, sort = TRUE) 
 list(table1,table6)%>% 
-  kable(caption = "general interested relevant groups")%>%
-  kable_classic(full_width = F) %>%
+  kable(caption = "summary statistic of interested relevant groups") %>%
   kable_styling(latex_options = "HOLD_position") 
 list(table3,table4,table5)%>% 
   kable() %>%
-  kable_classic(full_width = F)%>%
   kable_styling(latex_options = "HOLD_position") 
 table2%>% 
   kable() %>%
-  kable_classic(full_width = F)%>%
   kable_styling(latex_options = "HOLD_position") 
 ```
+
+# Result
 
 ```{r,echo=FALSE,error=FALSE,warning=FALSE}
 feeling_data <- gss %>% select(feelings_life, age) %>% filter(!is.na(feelings_life))
@@ -109,8 +117,15 @@ geom_line()+
   labs(x = "age", y = "average feelings of life from 0 to 10", title = "relationship between age and feelings_life") 
 ```
 
+To gain a further understanding of Canadians' feeling about life, we visualized the average feeling about life in each age (15-80 years old). According to Figure 2, we noticed that in childhood, starting from the age of 15, the score of feelings about life is the highest, reaching an average of 8.7. However, the ratings experience a sharp drop immediately, reaching the lowest point around the age of 22, at about 7.65, about 12 percentage points within 7 years, which may be related to the responsibility and stress brought by the separation from childhood. After that, the happiness of life rebounded, but it fell to a local minimum again around the age of 43, and gradually increased as the middle-aged entered old age. Happiness in the 20s to 50s range can be summed up as a notion of U-shape, which is often cited as evidence of the midlife crisis.
+
+There is no doubt that the feeling about life is highly correlated with age, but focusing on a single trajectory of happiness has limited scientific and applied value because it obscures the diversity of entire life processes and their sources. There are researches that criticize the robustness that uses U-shape to generalize people's cross-life happiness as well as corroboration of midlife crisis. (The U Shape of Happiness Across the Life Course: Expanding the Discussion) It points out that multidisciplinary statistical analysis is necessary to conduct. Given that we could not get enough data from the single-year survey to examine individual differences in how and why people change in different settings and at different stages of life, we choose to focus on multidisciplinary social attributes that are not affected by the time to generalize the correlates of the feeling of life.
+
+## Feelings about life under multidisciplinary social attributes
+
+
 ```{r,echo=FALSE,error=FALSE,warning=FALSE}
-a=c(1,2,3,4,5,6,7,8,9,10)
+
 income_data <- gss %>% select(income_respondent, feelings_life) %>% filter(!is.na(feelings_life) & !is.na(income_respondent))
 incomedata <- income_data %>%group_by(feelings_life) %>% summarise("<$25,000" = sum(income_respondent == "Less than $25,000"),"$25,000 to $49,999" = sum(income_respondent == "$25,000 to $49,999"), "$50,000 to $74,999" = sum(income_respondent == "$50,000 to $74,999"),"$75,000 to $99,999" = sum(income_respondent == "$75,000 to $99,999"), "$100,000 to $124,999" = sum(income_respondent == "$100,000 to $ 124,999"),"$125,000 and more" = sum(income_respondent == "$125,000 and more"))
 incomedata$`<$25,000` = incomedata$`<$25,000`/sum(incomedata$`<$25,000`)
@@ -137,8 +152,8 @@ edudata$Bachelor =edudata$Bachelor /sum(edudata$Bachelor)
 edudata$`trade certificate` = edudata$`trade certificate`/ sum(edudata$`trade certificate`)
 edudata$`under Bachelor` = edudata$`under Bachelor` /sum(edudata$`under Bachelor`)
 edudata$`above Bachelor` =edudata$`above Bachelor` /sum(edudata$`above Bachelor`)
-dfc <- gather(edudata, key = edu_group, value = percent_of_Respondent, c("below high school", "high school","trade certificate","college", "under Bachelor", "Bachelor","above Bachelor"))
-gfb <- ggplot(dfc, aes(x=feelings_life, y = percent_of_Respondent, group = edu_group, colour = edu_group)) +
+dfc <- gather(edudata, key = education_group, value = percent_of_Respondent, c("below high school", "high school","trade certificate","college", "under Bachelor", "Bachelor","above Bachelor"))
+gfb <- ggplot(dfc, aes(x=feelings_life, y = percent_of_Respondent, group = education_group, colour = education_group)) +
   geom_line() +
   theme_classic() + scale_x_continuous(breaks = a)+
   labs( title="different education group relevant to feelings_life")
@@ -169,8 +184,8 @@ mentalhealth_data$Fair = mentalhealth_data$Fair /sum(mentalhealth_data$Fair)
 mentalhealth_data$Good = mentalhealth_data$Good /sum(mentalhealth_data$Good)
 mentalhealth_data$Poor = mentalhealth_data$Poor/sum(mentalhealth_data$Poor)
 mentalhealth_data$`Very good` =mentalhealth_data$`Very good`/sum(mentalhealth_data$`Very good`)
-dfh <- gather(mentalhealth_data, key = metal_group, value = percent_of_Respondent, c("Excellent", "Fair","Good", "Poor", "Very good"))
-gfd <- ggplot(dfh, aes(x=feelings_life, y = percent_of_Respondent, group = metal_group, colour = metal_group)) +
+dfh <- gather(mentalhealth_data, key = mental_health_group, value = percent_of_Respondent, c("Excellent", "Fair","Good", "Poor", "Very good"))
+gfd <- ggplot(dfh, aes(x=feelings_life, y = percent_of_Respondent, group = mental_health_group, colour = mental_health_group)) +
   geom_line() +
   theme_classic() + scale_x_continuous(breaks = a)+
   labs( title="different mental_health group relevant to feelings_life")
@@ -185,8 +200,8 @@ workdata$`0.1 to 29.9 hours` = workdata$`0.1 to 29.9 hours`/sum(workdata$`0.1 to
 workdata$`30.0 to 40.0 hours` = workdata$`30.0 to 40.0 hours`/ sum(workdata$`30.0 to 40.0 hours`)
 workdata$`40.1 to 50.0 hours` = workdata$`40.1 to 50.0 hours`/sum(workdata$`40.1 to 50.0 hours`)
 workdata$`50.1 hours and more` = workdata$`50.1 hours and more`/sum(workdata$`50.1 hours and more`)
- dff <- gather(workdata, key = work_group, value = percent_of_Respondent, c("0 hour", "0.1 to 29.9 hours","30.0 to 40.0 hours", "40.1 to 50.0 hours", "50.1 hours and more"))
-gfe <- ggplot(dff, aes(x=feelings_life, y = percent_of_Respondent, group = work_group, colour = work_group)) +
+ dff <- gather(workdata, key = working_hour_per_week_group, value = percent_of_Respondent, c("0 hour", "0.1 to 29.9 hours","30.0 to 40.0 hours", "40.1 to 50.0 hours", "50.1 hours and more"))
+gfe <- ggplot(dff, aes(x=feelings_life, y = percent_of_Respondent, group = working_hour_per_week_group, colour = working_hour_per_week_group)) +
   geom_line() +
   theme_classic() + scale_x_continuous(breaks = a)+
   labs( title="different number of hours worked per week group relevant to feelings_life")
@@ -208,6 +223,7 @@ gff <- ggplot(dfg, aes(x=feelings_life, y = percent_of_Respondent, group = marit
   theme_classic() + scale_x_continuous(breaks = a)+
   labs( title="different types marital status per week group relevant to feelings_life")
 ```
+
 ```{r,echo=FALSE, warning=FALSE, fig.height = 12, fig.width = 12}
 gg_all <- (gfa + gfb) /
 (gfc + gfd) /
@@ -216,6 +232,28 @@ gg_all <- (gfa + gfb) /
   theme(plot.title = element_text(hjust = 0.5))
 gg_all 
 ```
+
+
+In Figure 3 panel A, we draw the respondents’ happiness level by their income group. All groups show a similar pattern in this plot, with a shift up when the income increases by one group when people are feeling good about their life. Among the respondents who rated high happiness score, the most proportion was taken up by people who have higher income, specifically, the more people earned, the happier they feel. Between feelings of life score 4-6, people who earned the least took the largest proportion, the proportion of respondents increases as they earn less. The difference in happiness is unobservable among people who rated 0-4 and 6-8. From these patterns, we can see that the people’s feelings of life in each income group are aligned with the general pattern, with a higher fluctuation in higher income groups. It is eligible to say that income level affects people’s happiness level in a way, but not a crucial one. 
+
+Panel B of Figure 3 checks the potential effect of people’s educational level on feelings of life. We can see from the graph, the lines are nearly paralleled before the score of life feeling reached to 9. The trend of this graph is also aligned with the general pattern of all respondents’ feelings of life score, which is also the overall pattern of panel 4, there is possibly a high correlation between income and educational levels. People who receive lower education have a larger proportion in happiness level is less than 6. The most proportion of the people who are feeling excellent about their life, rate above 9 at feelings of life, comes from those whose highest education is college. It is eligible to say that although the educational level doesn’t contribute much to how respondents feel about their lives, the group of people who receive a college diploma have a higher ability to gain happiness in life. 
+
+In panel C, we examined the relevance between different health groups and people’s feelings of life. Each group shows a left-skewed pattern in this graph, however, with a much different extent. With the declines in self-rated health scores, the extent of left-skewed is gradually diminished. The pattern of excellent health group shows an extremely left-skewed trend with only one mode. The skewness in the shape of self-rated fair health level becomes much milder, also, a double-peaked pattern shows in this group. A very classic double-peaked pattern shows in the group which self-rated poor in health. The patterns in different health groups have relatively apparent differences with the overall trend, which indicates distinct health situations have a relatively remarkable effect on people’s feelings of life. 
+
+In Figure3, panel D shows how people’s mental health situations can relate to their feeling about life. People who are poor in mental health have a relatively flattened distribution compared to other groups, with a peak at the score of 5. In addition, the proportion of people in this group whose happiness level is above the overall average is extremely small. The trends of respondents’ proportion of good and very good mental health situations basically align with the overall general distribution. The shape of an excellent mental health group is similar to the distribution of an excellent physical health group. There might exist a correlation between excellent physical health groups and excellent mental health groups. Intuitively, physical health would surely influence people’s experience, however, mental health can be a result of what’s going on in current life. 
+
+Panel E of Figure 3 illustrates people’s feelings of life by their different number of hours worked per week. Surprisingly, the happiness level of people who don’t work at all is not even reaching the average level. This group concentrated on a happiness level of 5, the proportion of 5 rating people in this group is much more than the other groups. The overall happiness level of people who work above 50 hours, the longest working hours, is the second to last among all. The two extreme working markets are disadvantages to the majority’s happiness level. The comprehensive highest happiness level belongs to respondents who work 40.1 – 50.0 hours per week, the second-highest group is 30 – 40 hours per week. It is appropriate to conclude that working 6 – 8 hours per week is reasonable and beneficial to people’s feelings. Yet it is worth noting that people who work more than 50 hours per week have a high share in the extremely high happiness group. These scores were possibly rated by people who work long hours and have a high income, which also reveals the considerable internal variation in this group. Generally speaking, working 40.1 – 50 hours per week is most beneficial to feelings of life.
+
+In Figure 3, panel F reviews how people’s happiness levels vary in different marital statuses. In all 6 groups of marital status, the married group has the happiest life experience. The distribution of married people in the percentage of respondents has the most left-skewed shape among all groups, which suggests that there is the highest proportion of people who feel very good and excellent in their lives. The living common-law group has the most proportion at around 7.5 scores, the proportion of people who feel low in happiness is also low. However, there are only few people in this living common-law group who reach a very high happiness level. Among single living respondents (Separated, Single and never married, Widowed groups), the widowed group of people has comprehensively nicer feelings of life, on the contrary, people who are separated from their partners have the lowest happiness level. We might be able to conclude that separated situation is most to the disadvantage of people’s feelings of life. Therefore, having a romantic relationship is beneficial to delightful life. 
+
+We are surprised by how romantic relationships help people to gain a joyful life, also the face that widowed group has the highest feelings of life score among people who live alone. Additionally, in our sample, about 6,000 respondents are married, which approximately equals the sum of the rest five groups. Since the significance of marriages shows in the distribution and a large number of married respondents in our sample data, we would like to further investigate how and why married status can be beneficial to individuals’ feelings of life. 
+
+
+## Feelings about life of married people, with focus on sexual difference 
+
+In the above study, we found that married people were more likely to be satisfied with their lives. For the purpose of finding methods to achieve a better life experience, we focused on the group of people under married status. Specifically, we aimed to make a summary of the characteristics that a marriage of high life happiness has. In this process, we found that the overall feelings about the life pattern of males and females are consistent in the absence of limited conditions; However, in the context of marriage, men and women show different characteristics for specific social factors. This means that couples in a marriage should pay attention to each other's differences in their pursuit of a happy life since they have different priorities to maintain or adjust.
+
+### Average working hour per week on feelings about life, by gender
 
 ```{r,echo=FALSE,error=FALSE,warning=FALSE}
 tmp2 <- gss %>% select(average_hours_worked, feelings_life, sex) %>% filter(!is.na(feelings_life) & !is.na(average_hours_worked) &!is.na(sex) & average_hours_worked != "Don't know")
@@ -241,6 +279,14 @@ ggplot(tmp4, aes(x=average_hour, y = feeling_of_life, group = feeling_of_differe
   labs(x = "average_hour of work per week" ,title="different groups of working hours relevant to feelings_life")
 ```
 
+Based on the figure above, increasing average hours of work per week has a positive influence on the rating score of feelings about life for Canadian people. However, the patterns have a prominent gap between that of males and females.
+
+Married men and women both had their lowest life satisfaction during unemployment, but the severity varied widely—women's average life feeling was about 7.6, and men's about 6.1. With the increase of working hours to at least 20 hours per week, the life satisfaction of married men has greatly improved, reaching about 7.75, which is close to the average life satisfaction, and the life satisfaction of women also shows a clear upward trend. Subsequently, the life satisfaction of men continued to rise with the increase of working hours, and the highest rating score occurs when the working hour is least 60 hours per week, and their average life satisfaction reached about 8.3; while women's average life satisfaction reached its peak, about 7.7, when the working hours per week rose to 40-60 hours, which is similar to the maximum value for men, but the happiness value drops after working more than 60h per week, and it is almost the same as that when working 20-40h per week.
+
+In conclusion, having a job is one of the ways to increase life satisfaction for both married men and women, and this feature is also in line with global law summarised by other researchers (Happiness Decomposition: Female Optimism). It's worth noting that the changing process from unemployed to employed has the largest marginal effect, especially for men, whose life satisfaction is significantly lower than the national average when having no job or business. Longer working hours, that is, more than 60 hours per week, are still more attractive to men, and even the marginal effect does not completely show a gradually decreasing trend; for women, however, extremely long hours (longer than 60 hours a week) have a negative impact on life satisfaction. This may be due to physical differences between men and women, as well as different expectations and obligations imposed by society.
+
+### Number of total children on feelings about life, by gender
+
 ```{r,echo=FALSE,error=FALSE,warning=FALSE}
 t_mp2 <- gss %>% select(total_children, feelings_life, sex) %>% filter(!is.na(feelings_life) & !is.na(total_children) &!is.na(sex))
 t_mp21<- t_mp2 %>%filter(sex =="Male")
@@ -253,8 +299,17 @@ t_mp4 <- gather(t_mp3, key = feeling_of_different_sex, value = feeling_of_life, 
 ggplot(t_mp4, aes(x=total_children, y = feeling_of_life, group = feeling_of_different_sex, colour = feeling_of_different_sex)) +
   geom_line() +
   theme_classic() + scale_x_continuous(breaks = a)+ 
-  labs( title="different education group relevant to feelings_life")
+  labs( title="Total children relevant to feelings_life")
 ```
+
+Children are undoubtedly an important proposition in married life. With the emancipation of the mind, the reform of the economic environment, the improvement of women's status, and other social factors, topics such as reproductive rights and DINK freedom have been widely discussed. According to the above figure, we can initially see the general attitude of the married population to the number of births, and the pattern difference between the total number of children and its impact on life satisfaction on men and women.
+
+Childlessness showed a negative impact on the life of married men and women, but less on women: the average life satisfaction of married women without children was higher than 7.95, which was close to the average; the average of married men without children Life satisfaction is about 7.8. After having the first child, the life satisfaction of married men and women is significantly improved. The marginal effect is particularly obvious for men, and the average life satisfaction is higher than that of women when they have two children. Then, when the total number of children is between 2 and 6, the average life satisfaction of married men and women both fluctuates in the same trend. Specifically, the overall average value of men is higher and their fluctuation is more moderate and reaches the highest value of 8.3 when they have 6 children. Finally, when the total number of children reached 7, the average life satisfaction of men plummeted, about the same as when the total number of children os 1; however, the life satisfaction of women continued to climb, reaching a peak of 8.5.
+
+Using this dataset, we could see that most married couples hope to have children of their own, and men tend to get more happiness from having children. However, while having too many children caused men's life satisfaction to plummet, women showed surprising acceptance. Such a conclusion conflicts with some other studies: “Happiness, life satisfaction and well-being: Survey Design and Response Analysis” mentioned that "Having children increases happiness and well-being in women while it has no Effect on males ". This may be due to differences in the definition of life satisfaction and life happiness, or we adopt the wrong way to build the relationship between the feeling of life and total children. In any case, more research is necessary to be conducted. 
+
+### Spouse age difference on feelings about life, by gender
+
 
 ```{r,echo=FALSE,error=FALSE,warning=FALSE}
 age_diff_data <- gss %>% select(age_diff, feelings_life,sex) %>% filter(!is.na(feelings_life) & !is.na(age_diff)& age_diff != "Don't know" & sex == "Male")
@@ -312,11 +367,60 @@ gfh <-ggplot(tmp4, aes(x=agediff, y = feeling_of_life, group = feeling_of_agedif
   labs(x = "difference of age for female", title="different groups of working hours relevant to feelings_life")
 (gfg | gfh)
 ```
+
+As can be seen from the above figure, there is a gap in the age range of ideal spouses for men and women in the purpose of chasing a satisfying life. Panel A on the left depicts the difference in average life satisfaction for men with varying degrees of older and younger spouses, while panel B depicts women's. It can be clearly observed that men with younger spouses generally have higher life satisfaction, while the opposite is true for women. The overall volatility of male data is greater, which may be due to the smaller amount of data for the relevant age group. But through cursory observation, it can be found that for men, those who have a spouse 2-4 years younger than themselves have the highest average life satisfaction. Women's average life satisfaction tends to decline in general as the age gap with their spouses increases, both in groups with older and younger spouses. Among them, married women have the highest average life satisfaction when their spouse is 2 years older than them; the second highest is the group with a spouse who is two years younger than them. When the spouses are more than 6 years younger than themselves, the average life satisfaction of women drops significantly, reaching a minimum value of around 7.75.
+
+Therefore, we conclude that men and women are more likely to have a more satisfying life when they have a spouse with a smaller age gap; the difference is that men would generally tend to choose a spouse younger than themselves, while women would tend to choose a spouse who is younger than them, based on the statistical analysis.
+
+# Discussion
+
+## Survey
+
+A discussion of the survey’s methodology, and its key features, strengths, and weaknesses. For instance: what is the population, frame, and sample; how is the sample recruited; what sampling approach is taken, and what are some of the trade-offs of this; how is non-response handled.
+
+This paper conducts analysis base on the dataset from 2017 General Social Survey (GSS) on the family. The survey targets on the population includes all non-institutionalized persons 15 years of age and older, living in the 10 provinces of Canada (excluding Yukon, Northwest Territories, and Nunavut). The frame that the survey adopted the redesigned GSS frame, which integrates data from sources of telephone numbers (landline and cellular) available to Statistics Canada and the Address Register (AR). This new frame includes “cell phone only” households, a growing population not covered by the previous frame. Data for the 2017 GSS was collected via computer assisted telephone interviews (CATI) from February 2 to November 30, 2017. Respondents were randomly selected from households that meet the eligibility criteria and interviewed in the official language of their choice without permission of proxy interviews. 
+
+We believe that the sample can be assessed as reliable for 2 main reasons. First, the actual sample size (20,602) arrive the requirement of the target sample size (20,000). Second, the sample size in each province has been accurately controlled in order to either satisfies the acceptable sampling variability at the stratum level, or balances the need for precision of both national-level and stratum-level estimates.
+
+
+
+
+## Questionnaire
+
+what is good and bad about it?
+
+## Findings
+
+## Weakness
+
+1. Short term fluctuation
+
+For questions like feeling about life, the answers given by respondents when participating in the survey are highly subjective, which means that we cannot well identify whether their logic and decision are in line with the initial design of the questions' definition and intent. In this survey, the feeling about life aims to summarize the respondents' general feelings about their current life. This reflects two main points, one is that the time horizon is medium to long-term --- it should not be limited to a week or even a month; the other is that there should be an overall assessment of the feelings caused by all the events in life --- one or two fluctuation events should not constitute all the considerations when making conclusions. Whether to check the compliance of the above two elements has become one of the significant criteria for judging the accuracy of the index feeling about life. Based on the variables present in the dataset, we try to give relevant judgments as far as we can.
+
 ```{r,echo=FALSE,error=FALSE,warning=FALSE}
 work_last_data <- gss %>% select( worked_last_week, feelings_life) %>% filter(!is.na(feelings_life) & !is.na(worked_last_week)& worked_last_week != "Don't know")
 work_last_data$feelings_life <-round(work_last_data$feelings_life)
 group <- work_last_data %>%group_by(worked_last_week) %>% summarise(n=n())
  ggplot(work_last_data, aes(x= feelings_life, fill = worked_last_week)) +
   geom_bar() +
-  labs( title="different feelings_life group")
+  labs( title="different feelings_life group") +
+   theme_classic()
 ```
+
+
+The variable "LMAM_01" describes whether they worked at a job or business last week regardless of the number of hours with the universe of all respondents. According to the feedback, 58% of respondents worked last week and 41.9% of respondents did not at the time they answered the survey, which is a relatively balanced situation. Among the 9830 respondents whose answers were "No" or "Don't know" to the question "worked or not last week", only 155 of them had no stable job or business by filtering out those who answered "0 hours" and "Don't know" to the question "average working hours per week". Therefore, we can make an assumption that the variable "LMAM_01" can represent a short-term fluctuation, especially to those who have a job. Based on the findings from figure 2 panel E, the patterns of feelings about life between people who have work and those who do not have one show distinct differences. Therefore, one possible hypothesis is that people's emotions may occur short-term fluctuation if they are free from work temporarily before they answer the survey. Under this hypothesis, we visualized the distribution of feelings about life grouping by whether the respondent worked the week before they answered the survey. As a result, the two groups are distributed in a nearly equal proportion in every stack of the score for feelings about life. Therefore, we give preliminary approval to the accuracy of the Feeling About Life index.
+
+However, the influence on feelings about life given by working hours per week may only be efficient under a long-term period. In other words, people's feelings about their life have obscure change by a one-week absence from work. Therefore, more variables are needed to examine the existence of short-term fluctuation, which should be considered when designing augmentation for the survey.
+
+## Future work
+
+## 
+
+
+# Appendix
+
+
+
+
+
+
