@@ -38,7 +38,8 @@ library(qrcode)
 
 The dataset we used in this report is the 2017 General Social Survey (GSS) on families in Canada. GSS is viewed as an important foundational social survey within Canada’s national statistical system, and we were able to obtain some points of view toward essential topics if specific social policy issues from it. Current GSS themes are caregiving, families, time use, social identity, volunteering and victimization. There were similar datasets collected within other countries and regions, also with focuses on Canadian’s provinces. However, since we would like to examine the national feelings about life among Canadian citizens, this specific dataset was chosen. This data was selected to examine Canadians’ feelings about life and explore potential causes in other relevant aspects in daily life. The 2017 GSS dataset was collected from 2 February to 30 November 2017 through telephone interviews. This 2017 GSS is a dataset contained a big amount of information about families in Canada. The original survey involves 461 questions overall, which gives this dataset a total number of 461 variables. The sample size for 2017 GSS dataset is 20,602.
 
-The dataset was processed and analyzed in R[@R1] and I analyzed all these using R package including: readr[@readr], tidyverse[@tidyverse], ggplot2[@ggplot2],  gcookbook[@gcookbook], dplyr[@dplyr], kableExtra[@kableExtra], car[@car], patchwork[@patchwork] and qrcode[@qrcode].
+The dataset was processed and analyzed in R[@R1] and I analyzed all these using R package including: readr[@readr], tidyverse[@tidyverse], ggplot2[@ggplot2],  gcookbook[@gcookbook], dplyr[@dplyr], kableExtra[@kableExtra], car[@car], patchwork[@patchwork] and qrcode[@qrcode].\
+
 ## EDA
 
 ```{r,echo=FALSE,error=FALSE,warning=FALSE, fig.height = 3, fig.width = 6}
@@ -63,10 +64,19 @@ table1 <- feel %>% summarise(min = min(feelings_life),
 table1
 ```
 
-Figure 1 reflects the distribution of feeling about life as a whole among the survey sample, which is 20602 non-institutional respondents from Canada 2017 general social survey. The current feelings about life as a whole are expressed using a scale of 0 to 10, where 0 means "Very dissatisfied" and 10 means "Very satisfied". All respondents are required to answer the question "how do you feel about your life as a whole right now?". Under the assumption that the sample size is fair enough to represent the whole population, all persons 15 years of age and older in Canada in 2017, without selection bias, we can conclude a general situation of Canadian feelings about life.
+Figure 1 reflects the distribution of feeling about life as a whole among the survey sample, which is 20602 non-institutional respondents from Canada 2017 general social survey. The current feelings about life as a whole are expressed using a scale of 0 to 10, where 0 means "Very dissatisfied" and 10 means "Very satisfied". All respondents are required to answer the question "how do you feel about your life as a whole right now?". Under the assumption that the sample size is fair enough to represent the whole population, all persons 15 years of age and older in Canada in 2017, without selection bias, we can conclude a general situation of Canadian feelings about life.\
 
 The distribution of feelings about life is left-skewed and single-peaked, which means most Canadian people have an above-average (>5) feeling about their life and the major responses are concentrated in the score of 8. Moreover, the second and third largest proportion of scores being selected is 10 and 9, the two best scores can be given by the respondents when filling in the survey. One explanation that counterarguments the positive estimation of Canadian life feeling is Canadians may prone to give extreme emotional expression when rating their feeling of life. However, less number of the response of score 0 is given. Therefore, it is rational to say that Canadians report high levels of happiness about life.
 
+Figure 2 shows all six interested groups that may affect the distribution of feelings about life. Panel A is called the "different income_respondent group" and it represents the total income before tax of the respondent of the family. There are 6 groups including here as a scale from the lowest one, “Less than $25,000” to the highest one “$125,000 and more”. The most common category of panel A is $25,000 to $49,999 and the least common category is $100,000 to $ 124,999. It is approximately 5 times more common in the highest category than the lowest one. Therefore, it is rational to say that most Canadians earn under $100,000 per year.
+
+Panel B is called “different education group” and it represents the highest certificate, diploma, or degree that respondent achieved. Among them, the current education is expressed in different 7 classes. The lowest one is called “Less than high school diploma or its equivalent”. And the highest diploma is “University certificate, diploma or degree above the bachelor”.  The most common category of panel B is “High school diploma or a high school equivalency certificate” and the least common category is “University certificate or diploma below the bachelor’s level”. It is approximately 8 times more common in the highest category than the lowest one.
+
+Panel C is called “different self_rated_health group”. In the survey, the original question was :the general health of the respondent, and it was rated by 5 ranks from “Poor” to “Excellent”. The most common category of panel C is “Very good” and the least common category is “Poor”. It is approximately 11 times more common in the highest category than the lowest one. And Panel D represents the general mental health of the respondent. Among them, with the same scale, the excellent and poor still mean the best and worst. The most common category of panel D is “Very good” and the least common category is “Poor”. It is approximately 25 times more common in the highest category than the lowest one.
+
+Panel E is called “different average_hours_worked group” and it represents the average number of hours worked per week in 5 different groups. The lowest one is “0 hour”. And the highest one is “50.1 hours and more”.  The most common category of panel B is “30.0 to 40.0 hours” and the least common category is “0 hour” which is approximately 0. 
+
+Panel F is called “different marital_status group” and it represents the marital status of the respondent in 6 different groups. The most common category of panel F is “Married” and the least common category is “Separated”.  It is approximately 20 times more common in the highest category than the lowest one.\
 ```{r,echo=FALSE, warning=FALSE, fig.height = 12, fig.width = 12}
 gss_data <- gss %>% filter(!is.na(income_respondent)&!is.na(education)&!is.na(self_rated_health)&!is.na(self_rated_mental_health)&!is.na(average_hours_worked)&!is.na(average_hours_worked)&!is.na(marital_status)& self_rated_health != "Don't know"& self_rated_mental_health != "Don't know"&average_hours_worked != "Don't know"& marital_status != "Don't know")
 g1<-ggplot(gss_data, aes(y= income_respondent)) +
@@ -101,35 +111,9 @@ g_all <- (g1 + g2) /
 g_all    
 ```
 
-Figure 2 shows all six interested groups that may affect the distribution of feelings about life. Panel A is called the "different income_respondent group" and it represents the total income before tax of the respondent of the family. There are 6 groups including here as a scale from the lowest one, “Less than $25,000” to the highest one “$125,000 and more”. The most common category of panel A is $25,000 to $49,999 and the least common category is $100,000 to $ 124,999. Combined with table.2 we can conclude that, it is approximately 5 times more common in the highest category than the lowest one. Therefore, it is rational to say that most Canadians earn under $100,000 per year.
-
-Panel B is called “different education group” and it represents the highest certificate, diploma, or degree that respondent achieved. Among them, the current education is expressed in different 7 classes. The lowest one is called “Less than high school diploma or its equivalent”. And the highest diploma is “University certificate, diploma or degree above the bachelor”.  The most common category of panel B is “High school diploma or a high school equivalency certificate” and the least common category is “University certificate or diploma below the bachelor’s level”. It is approximately 8 times more common in the highest category than the lowest one.
-
-Panel C is called “different self_rated_health group”. In the survey, the original question was :the general health of the respondent, and it was rated by 5 ranks from “Poor” to “Excellent”. The most common category of panel C is “Very good” and the least common category is “Poor”. It is approximately 11 times more common in the highest category than the lowest one. And Panel D represents the general mental health of the respondent. Among them, with the same scale, the excellent and poor still mean the best and worst. The most common category of panel D is “Very good” and the least common category is “Poor”. It is approximately 25 times more common in the highest category than the lowest one.
-
-Panel E is called “different average_hours_worked group” and it represents the average number of hours worked per week in 5 different groups. The lowest one is “0 hour”. And the highest one is “50.1 hours and more”.  The most common category of panel B is “30.0 to 40.0 hours” and the least common category is “0 hour” which is approximately 0. 
-
-Panel F is called “different marital_status group” and it represents the marital status of the respondent in 6 different groups. The most common category of panel F is “Married” and the least common category is “Separated”.  It is approximately 20 times more common in the highest category than the lowest one.
 
 
-```{r,echo=FALSE, warning=FALSE}
-table <-gss %>% filter(!is.na(income_respondent)&!is.na(education)&!is.na(self_rated_health)&!is.na(self_rated_mental_health)&!is.na(average_hours_worked)&!is.na(average_hours_worked)&!is.na(marital_status)& self_rated_health != "Don't know"& self_rated_mental_health != "Don't know"&average_hours_worked != "Don't know"& marital_status != "Don't know")
-table1 <- table %>% count(income_respondent, sort = TRUE)
-table2 <- table %>% count(education, sort = TRUE) 
-table3 <- table %>% count(self_rated_health, sort = TRUE) 
-table4 <-table %>% count(self_rated_mental_health, sort = TRUE) 
-table5 <-table %>% count(average_hours_worked, sort = TRUE) 
-table6 <-table %>% count(marital_status, sort = TRUE) 
-list(table1,table6)%>% 
-  kable(caption = "summary statistic of interested relevant groups") %>%
-  kable_styling(latex_options = "HOLD_position") 
-list(table3,table4,table5)%>% 
-  kable() %>%
-  kable_styling(latex_options = "HOLD_position") 
-table2%>% 
-  kable() %>%
-  kable_styling(latex_options = "HOLD_position") 
-```
+
 
 
 ## Methodology
@@ -153,7 +137,7 @@ geom_line()+
 
 To gain a further understanding of Canadians' feeling about life, we visualized the average feeling about life in each age (15-80 years old). According to Figure 3, we noticed that in childhood, starting from the age of 15, the score of feelings about life is the highest, reaching an average of 8.7. However, the ratings experience a sharp drop immediately, reaching the lowest point around the age of 22, at about 7.65, about 12 percentage points within 7 years, which may be related to the responsibility and stress brought by the separation from childhood. After that, the happiness of life rebounded, but it fell to a local minimum again around the age of 43, and gradually increased as the middle-aged entered old age. Happiness in the 20s to 50s range can be summed up as a notion of U-shape, which is often cited as evidence of the midlife crisis.
 
-There is no doubt that the feeling about life is highly correlated with age, but focusing on a single trajectory of happiness has limited scientific and applied value because it obscures the diversity of entire life processes and their sources. There are researches that criticize the robustness that uses U-shape to generalize people's cross-life happiness as well as corroboration of midlife crisis. (The U Shape of Happiness Across the Life Course: Expanding the Discussion) It points out that multidisciplinary statistical analysis is necessary to conduct. Given that we could not get enough data from the single-year survey to examine individual differences in how and why people change in different settings and at different stages of life, we choose to focus on multidisciplinary social attributes that are not affected by the time to generalize the correlates of the feeling of life.
+There is no doubt that the feeling about life is highly correlated with age, but focusing on a single trajectory of happiness has limited scientific and applied value because it obscures the diversity of entire life processes and their sources. There are researches that criticize the robustness that uses U-shape to generalize people's cross-life happiness as well as corroboration of midlife crisis. (@Shape) It points out that multidisciplinary statistical analysis is necessary to conduct. Given that we could not get enough data from the single-year survey to examine individual differences in how and why people change in different settings and at different stages of life, we choose to focus on multidisciplinary social attributes that are not affected by the time to generalize the correlates of the feeling of life.
 
 ## Feelings about life under multiple social attributes
 
@@ -278,7 +262,7 @@ In Figure4, panel D shows how people’s mental health situations can relate to 
 
 Panel E of Figure 4 illustrates people’s feelings of life by their different number of hours worked per week. Surprisingly, the happiness level of people who don’t work at all is not even reaching the average level. This group concentrated on a happiness level of 5, the proportion of 5 rating people in this group is much more than the other groups. The overall happiness level of people who work above 50 hours, the longest working hours, is the second to last among all. The two extreme working markets are disadvantages to the majority’s happiness level. The comprehensive highest happiness level belongs to respondents who work 40.1 – 50.0 hours per week, the second-highest group is 30 – 40 hours per week. It is appropriate to conclude that working 6 – 8 hours per week is reasonable and beneficial to people’s feelings. Yet it is worth noting that people who work more than 50 hours per week have a high share in the extremely high happiness group. These scores were possibly rated by people who work long hours and have a high income, which also reveals the considerable internal variation in this group. Generally speaking, working 40.1 – 50 hours per week is most beneficial to feelings of life.
 
-In Figure 4, panel F reviews how people’s happiness levels vary in different marital statuses. In all 6 groups of marital status, the married group has the happiest life experience. The distribution of married people in the percentage of respondents has the most left-skewed shape among all groups, which suggests that there is the highest proportion of people who feel very good and excellent in their lives. The living common-law group has the most proportion at around 7.5 scores, the proportion of people who feel low in happiness is also low. However, there are only few people in this living common-law group who reach a very high happiness level. Among single living respondents (Separated, Single and never married, Widowed groups), the widowed group of people has comprehensively nicer feelings of life, on the contrary, people who are separated from their partners have the lowest happiness level. We might be able to conclude that separated situation is most to the disadvantage of people’s feelings of life. Therefore, having a romantic relationship is beneficial to delightful life. 
+In Figure 4, panel F reviews how people’s happiness levels vary in different marital statuses. In all 6 groups of marital status, the married group has the happiest life experience. The distribution of married people in the percentage of respondents has the most left-skewed shape among all groups, which suggests that there is the highest proportion of people who feel very good and excellent in their lives. The living common-law group has the most proportion at around 7.5 scores, the proportion of people who feel low in happiness is also low. However, there are only few people in this living common-law group who reach a very high happiness level. Among single living respondents, the widowed group of people has comprehensively nicer feelings of life, on the contrary, people who are separated from their partners have the lowest happiness level. We might be able to conclude that separated situation is most to the disadvantage of people’s feelings of life. Therefore, having a romantic relationship is beneficial to delightful life. 
 
 We are surprised by how romantic relationships help people to gain a joyful life, also the face that widowed group has the highest feelings of life score among people who live alone. Additionally, in our sample, about 6,000 respondents are married, which approximately equals the sum of the rest five groups. Since the significance of marriages shows in the distribution and a large number of married respondents in our sample data, we would like to further investigate how and why married status can be beneficial to individuals’ feelings of life. 
 
@@ -494,7 +478,7 @@ However, the influence on feelings about life given by working hours per week ma
 2. Vague definition of feelings about life
 
 
-In this paper, we equate the variable "feelings about life" in the questionnaire to the level of satisfaction with life, because the answer choice of the question in the survey is scaled from "Very dissatisfied" to "Very satisfied". In the subsequent analysis and interpretation process, we did not pay attention to distinguish the notions of “happiness”, “life-satisfaction”, and “well-being”. These words are difficult to separate completely, especially during the survey process. But their definitions are subtly different, and may elicit different responses as respondents may recall their experience from different perspectives when answering the question. For example, happiness has been defined by scholars as "the experience of joy, contentment, or positive well-being, combined with the sense that one's life is good, meaningful and worthwhile" (@well); well being is defined in psychological literature For "Good mental state, including all of the various evaluations, positive and negative, that people make of their lives and the affective reactions of people to their experience" (@Guidelines). 
+In this paper, we equate the variable "feelings about life" in the questionnaire to the level of satisfaction with life, because the answer choice of the question in the survey is scaled from "Very dissatisfied" to "Very satisfied". In the subsequent analysis and interpretation process, we did not pay attention to distinguish the notions of “happiness”, “life-satisfaction”, and “well-being”. These words are difficult to separate completely, especially during the survey process. But their definitions are subtly different, and may elicit different responses as respondents may recall their experience from different perspectives when answering the question. For example, happiness has been defined by scholars as "the experience of joy, contentment, or positive well-being, combined with the sense that one's life is good, meaningful and worthwhile" (@well); well being is defined in psychological literature For "Good mental state, including all of the various evaluations, positive and negative, that people make of their lives and the affective reactions of people to their experience". 
 
 It is worth noting that these concepts may not be used equivalently, and even produce varying degrees of feedback on the same social indicators. Relevant literature shows that "empirical results are similar when running regressions on life satisfaction, happiness, and well-being, but several differences do emerge." For example, We find that age exerts a significant effect on satisfaction and happiness, while living in a Medium town exerts a negative and significant effect on happiness and well-being (@analysis). Therefore, this study can only be considered as a preliminary analysis of feelings about life, and cannot be strictly applied to the subdivisions of life satisfaction or happiness.
 
@@ -532,6 +516,27 @@ fig.10:screenshot of survey question 1-4 _____________ fig.11:screenshot of surv
 fig.12:screenshot of survey question 8-10 _____________ fig.13:screenshot of survey question 11-13\
 ![](WeChat Screenshot_20220320163931.png){#id .class width=50% height=120%}
 ![](WeChat Screenshot_20220320163954.png){#id .class width=50% height=120%}\
+\newpage
+
+```{r,echo=FALSE, warning=FALSE}
+table <-gss %>% filter(!is.na(income_respondent)&!is.na(education)&!is.na(self_rated_health)&!is.na(self_rated_mental_health)&!is.na(average_hours_worked)&!is.na(average_hours_worked)&!is.na(marital_status)& self_rated_health != "Don't know"& self_rated_mental_health != "Don't know"&average_hours_worked != "Don't know"& marital_status != "Don't know")
+table1 <- table %>% count(income_respondent, sort = TRUE)
+table2 <- table %>% count(education, sort = TRUE) 
+table3 <- table %>% count(self_rated_health, sort = TRUE) 
+table4 <-table %>% count(self_rated_mental_health, sort = TRUE) 
+table5 <-table %>% count(average_hours_worked, sort = TRUE) 
+table6 <-table %>% count(marital_status, sort = TRUE) 
+list(table1,table6)%>% 
+  kable(caption = "summary statistic of interested relevant groups") %>%
+  kable_styling(latex_options = "HOLD_position") 
+list(table3,table4,table5)%>% 
+  kable() %>%
+  kable_styling(latex_options = "HOLD_position") 
+table2%>% 
+  kable() %>%
+  kable_styling(latex_options = "HOLD_position") 
+```
+
 
 \newpage
 # Reference
