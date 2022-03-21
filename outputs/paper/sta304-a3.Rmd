@@ -1,5 +1,5 @@
 ---
-title: "Feelings About Life and Multiple Social Indicators: With Special Focus on Married Population by Gender"
+title: "Feelings About Life and Multiple Social Indicators: With Special Focus on Married Population by Gender^[Code and data are available at https://github.com/YN7666/sta-304-a3]"
 author: "Zelong Yu, Yiyi Ren, Zihan Jin"
 date: "03/20/2022"
 output: 
@@ -525,11 +525,11 @@ Thanks for your time and participation.\
 ![](WeChat Screenshot_20220320142307.png){#id .class height=90%}
 fig.9:screenshot of survey introduce
 \newpage
-fig.10:screenshot of survey 1-4 _____________ fig.11:screenshot of survey 4-7\
+fig.10:screenshot of survey question 1-4 _____________ fig.11:screenshot of survey question4-7\
 ![](WeChat Screenshot_20220320142338.png){#id .class width=50% }
 ![](WeChat Screenshot_20220320142402.png){#id .class width=50% height=120%}\
 \newpage
-fig.12:screenshot of survey 8-10 _____________ fig.13:screenshot of survey 11-13\
+fig.12:screenshot of survey question 8-10 _____________ fig.13:screenshot of survey question 11-13\
 ![](WeChat Screenshot_20220320163931.png){#id .class width=50% height=120%}
 ![](WeChat Screenshot_20220320163954.png){#id .class width=50% height=120%}\
 
